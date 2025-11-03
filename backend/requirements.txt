@@ -1,13 +1,11 @@
 flask
 flask-cors
 python-dotenv
-numpy
-pandas
+langgraph
 pyyaml
 requests
 httpx
 chromadb
-tensorflow
 cohere
 langchain
 langchain-chroma
