@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from agents.email_drafter import auto_email_agent
 from agents.meeting_scheduler import meeting_scheduler_agent
 from agents.policy_chatbot import policy_chatbot_agent
@@ -7,6 +8,7 @@ from agents.performance_analyzer import performance_analyzer_agent
 from agents.leave_processor import leave_processor_agent
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route('/email-drafter', methods=['POST'])
@@ -54,4 +56,6 @@ def route_leave_processor():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
