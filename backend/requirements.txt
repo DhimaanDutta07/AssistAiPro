@@ -1,11 +1,13 @@
 flask
 flask-cors
 python-dotenv
+pydantic
 cohere
 langchain
 langchain-chroma
 langchain-huggingface
-langgraph
+langchain-community
+langchain_cohere
 tensorflow
 numpy
 pandas
@@ -14,3 +16,4 @@ supabase
 openai
 PyYAML
 python-multipart
+pytz
