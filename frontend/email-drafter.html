@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Drafter – AssistAI Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--bg:#0a0e17;--card:#11151f;--accent:#00d4ff;--accent-glow:#00f5ff;--purple:#a855f7;--pink:#ec4899;--green:#10b981;--text:#e0f1ff;--text-muted:#88aacc;--border:#1e3a5f;--gradient:linear-gradient(135deg,#00b8ff,#00f5ff,#a855f7,#ec4899);--gradient-shift:300%}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;position:relative}
+    .cursor{position:fixed;width:24px;height:24px;border:2px solid var(--accent);border-radius:50%;pointer-events:none;z-index:10000;transition:transform .15s ease,background .15s ease;mix-blend-mode:difference}
+    .cursor-follower{position:fixed;width:50px;height:50px;border:1px solid var(--accent-glow);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .3s ease;opacity:.6}
+    .cursor.active{transform:scale(1.6);background:var(--accent)}
+    .bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2}
+    .bg-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(10,14,23,.94),rgba(17,21,31,.90));z-index:-1}
+    nav{position:fixed;top:0;width:100%;padding:20px 60px;display:flex;justify-content:space-between;align-items:center;z-index:1000;background:rgba(10,14,23,0.85);backdrop-filter:blur(25px);border-bottom:1px solid rgba(0,212,255,0.15)}
+    .nav-logo{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:900;background:var(--gradient);background-size:var(--gradient-shift);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:gradientShift 6s ease infinite}
+    @keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+    .nav-links{display:flex;gap:35px;list-style:none}
+    .nav-links a{color:var(--text);text-decoration:none;font-weight:600;position:relative;transition:color .3s}
+    .nav-links a::after{content:'';position:absolute;bottom:-6px;left:0;width:0;height:2px;background:var(--accent);transition:width .3s}
+    .nav-links a:hover{color:var(--accent)}
+    .nav-links a:hover::after{width:100%}
+    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:120px 20px 0}
+    .logo{font-family:'Orbitron',sans-serif;font-size:4.5rem;font-weight:900;background:var(--gradient);background-size:var(--gradient-shift);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.5rem;animation:gradientShift 5s ease infinite}
+    .tagline{font-size:1.4rem;color:var(--text-muted);max-width:800px;margin:1rem auto 2.5rem;line-height:1.7}
+    .input-container{max-width:800px;width:100%;margin:40px auto;background:var(--card);border:1px solid var(--border);border-radius:25px;padding:30px;backdrop-filter:blur(12px);box-shadow:0 15px 40px rgba(0,212,255,0.15)}
+    .input-group{margin-bottom:20px}
+    .input-group label{display:block;margin-bottom:10px;font-weight:600;color:var(--accent)}
+    .input-field{width:100%;padding:16px 20px;background:rgba(0,212,255,0.08);border:1px solid var(--border);border-radius:16px;color:var(--text);font-size:1rem;outline:none;transition:all .3s;resize:vertical}
+    .input-field:focus{border-color:var(--accent);box-shadow:0 0 20px rgba(0,212,255,0.3)}
+    .cta-button{display:inline-flex;align-items:center;gap:12px;padding:16px 36px;font-weight:700;font-size:1.1rem;background:linear-gradient(135deg,var(--accent),var(--accent-glow));color:#0a0e17;border:none;border-radius:60px;cursor:pointer;transition:all .4s ease;box-shadow:0 10px 30px rgba(0,212,255,0.4)}
+    .cta-button:hover{transform:translateY(-6px) scale(1.06);box-shadow:0 18px 50px rgba(0,212,255,0.7)}
+    .cta-button:disabled{opacity:0.6;cursor:not-allowed}
+    .output-container{max-width:900px;margin:60px auto;padding:0 20px}
+    .output-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;opacity:0;transform:translateY(30px);transition:all .6s ease}
+    .output-box::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:var(--gradient);background-size:var(--gradient-shift);animation:gradientShift 4s ease infinite;opacity:0}
+    .output-box.active{opacity:1;transform:translateY(0);border-color:var(--accent);box-shadow:0 20px 50px rgba(0,212,255,0.25)}
+    .output-box.active::before{opacity:1}
+    .output-header{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:700;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+    .output-icon{width:40px;height:40px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem}
+    .output-content{background:rgba(0,212,255,0.05);border-radius:16px;padding:20px;color:var(--text);line-height:1.8;white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:1rem}
+    .copy-btn{margin-top:16px;padding:10px 20px;background:rgba(0,212,255,0.12);color:var(--accent);border:1px solid var(--accent);border-radius:50px;cursor:pointer;font-weight:600;transition:all .3s}
+    .copy-btn:hover{background:var(--accent);color:#0a0e17;transform:translateY(-2px)}
+    footer{padding:80px 60px 40px;background:rgba(17,21,31,0.6);border-top:1px solid var(--border);margin-top:100px}
+    .footer-content{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:60px;margin-bottom:60px}
+    .footer-section h3{font-family:'Orbitron',sans-serif;color:var(--accent);margin-bottom:25px;font-size:1.3rem}
+    .footer-section a{color:var(--text-muted);text-decoration:none;display:block;margin-bottom:12px;transition:color .4s}
+    .footer-section a:hover{color:var(--accent);padding-left:6px}
+    .social-links{display:flex;gap:18px;margin-top:25px}
+    .social-links a{width:50px;height:50px;background:rgba(0,212,255,0.12);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .4s;font-size:1.2rem}
+    .social-links a:hover{background:var(--accent);color:#0a0e17;transform:translateY(-6px)}
+    .footer-bottom{text-align:center;padding-top:35px;border-top:1px solid var(--border);color:#666;font-size:.95rem}
+    @media(max-width:768px){.logo{font-size:3rem}.input-container,.output-container{padding:0 15px}nav{padding:15px 25px}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursorFollower"></div>
+  <canvas class="bg-canvas" id="bgCanvas"></canvas>
+  <div class="bg-overlay"></div>
+
+  <nav>
+    <div class="nav-logo">AssistAI Pro</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/#features">Features</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="logo">Email Drafter</div>
+    <p class="tagline">Generate professional, ready-to-send emails instantly with AI.</p>
+
+    <div class="input-container">
+      <div class="input-group">
+        <label for="query">Describe your email</label>
+        <textarea id="query" class="input-field" rows="6" placeholder="e.g., Request clarification on the remote work schedule from HR..."></textarea>
+      </div>
+      <button id="generateBtn" class="cta-button">
+        <span>Generate Email</span>
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+
+    <div class="output-container" id="outputContainer">
+      <div class="output-box" id="outputBox">
+        <div class="output-header">
+          <div class="output-icon"><i class="fas fa-envelope-open-text"></i></div>
+          Generated Email
+        </div>
+        <div class="output-content" id="output">Click "Generate Email" to see your drafted message.</div>
+        <button class="copy-btn" id="copyBtn" style="display:none;">Copy Email</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>AssistAI Pro</h3>
+        <p>Smart tools that make your workflow effortless.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 AssistAI Pro.</p>
+    </div>
+  </footer>
+
+  <script>
+    const cursor=document.getElementById('cursor');const follower=document.getElementById('cursorFollower');document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';setTimeout(()=>{follower.style.left=e.clientX+'px';follower.style.top=e.clientY+'px';},100);});document.addEventListener('mousedown',()=>cursor.classList.add('active'));document.addEventListener('mouseup',()=>cursor.classList.remove('active'));const canvas=document.getElementById('bgCanvas');const ctx=canvas.getContext('2d');canvas.width=window.innerWidth;canvas.height=window.innerHeight;const particles=[];class Particle{constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5;this.radius=Math.random()*2}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fillStyle='rgba(0,212,255,0.5)';ctx.fill()}}for(let i=0;i<50;i++)particles.push(new Particle());function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate)}animate();window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight});document.getElementById('generateBtn').addEventListener('click',async()=>{const query=document.getElementById('query').value.trim();if(!query){alert('Enter context');return}const btn=document.getElementById('generateBtn');btn.disabled=true;btn.innerHTML='<span>Generating...</span><i class="fas fa-spinner fa-spin"></i>';const output=document.getElementById('output');output.textContent='Processing...';try{const res=await fetch('http://localhost:5000/email-drafter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();const jsonStr=JSON.stringify(data,null,2);output.textContent=jsonStr;document.getElementById('outputBox').classList.add('active');const copyBtn=document.getElementById('copyBtn');copyBtn.style.display='inline-block';copyBtn.onclick=()=>{navigator.clipboard.writeText(jsonStr).then(()=>{const t=copyBtn.textContent;copyBtn.textContent='Copied!';setTimeout(()=>copyBtn.textContent=t,1500)})}}catch(err){output.textContent=`Error: ${err.message}`}finally{btn.disabled=false;btn.innerHTML='<span>Generate Email</span><i class="fas fa-paper-plane"></i>'}});
+  </script>
+</body>
+</html>

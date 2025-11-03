@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AssistAI Pro – Ultra Enterprise AI Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --card: #11151f;
+      --accent: #00d4ff;
+      --accent-glow: #00f5ff;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --green: #10b981;
+      --text: #e0f1ff;
+      --text-muted: #88aacc;
+      --border: #1e3a5f;
+      --gradient: linear-gradient(135deg, #00b8ff, #00f5ff, #a855f7, #ec4899);
+      --gradient-shift: 300%;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+    }
+    .cursor {
+      position: fixed;
+      width: 24px; height: 24px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transition: transform 0.15s ease, background 0.15s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-follower {
+      position: fixed;
+      width: 50px; height: 50px;
+      border: 1px solid var(--accent-glow);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+      opacity: 0.6;
+    }
+    .cursor.active { transform: scale(1.6); background: var(--accent); }
+    .bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+    .bg-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(10,14,23,0.94) 0%, rgba(17,21,31,0.90) 100%);
+      z-index: -1;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 20px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(10,14,23,0.85);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid rgba(0,212,255,0.15);
+    }
+    .nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 6s ease infinite;
+    }
+    @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .nav-links {
+      display: flex;
+      gap: 35px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      position: relative;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { width: 100%; }
+    .theme-toggle {
+      background: rgba(0,212,255,0.12);
+      border: 1px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      color: var(--accent);
+      transition: all 0.3s;
+      font-size: 1.1rem;
+    }
+    .theme-toggle:hover { background: var(--accent); color: #0a0e17; }
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+      position: relative;
+    }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 5.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.2rem;
+      letter-spacing: -3px;
+      animation: gradientShift 5s ease infinite;
+    }
+    .tagline {
+      font-size: 1.6rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 1.2rem auto 2.5rem;
+      line-height: 1.7;
+    }
+    .cta-group {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 40px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+      color: #0a0e17;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(0,212,255,0.4);
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transform: translate(-50%, -50%);
+      transition: width 0.7s, height 0.7s;
+    }
+    .cta-button:hover::before { width: 350px; height: 350px; }
+    .cta-button:hover {
+      transform: translateY(-6px) scale(1.06);
+      box-shadow: 0 18px 50px rgba(0,212,255,0.7);
+    }
+    .cta-secondary {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+    }
+    .cta-secondary:hover { background: rgba(0,212,255,0.12); }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 70px;
+      margin-top: 90px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .stat-label { color: var(--text-muted); margin-top: 8px; font-weight: 500; }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2.2s infinite;
+    }
+    @keyframes bounce {
+      0%,20%,50%,80%,100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(-25px); }
+      60% { transform: translateX(-50%) translateY(-12px); }
+    }
+    .scroll-indicator i { font-size: 2.2rem; color: var(--accent); }
+    .features-header {
+      text-align: center;
+      max-width: 900px;
+      margin: 160px auto 90px;
+      padding: 0 20px;
+    }
+    .features-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4rem;
+      font-weight: 900;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 5s ease infinite;
+      margin-bottom: 25px;
+    }
+    .features-subtitle {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 1.9;
+    }
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin: 60px 0;
+      flex-wrap: wrap;
+    }
+    .filter-tab {
+      padding: 14px 35px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.4s;
+      font-weight: 600;
+      backdrop-filter: blur(5px);
+    }
+    .filter-tab.active, .filter-tab:hover {
+      background: var(--accent);
+      color: #0a0e17;
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,212,255,0.3);
+    }
+    .features {
+      max-width: 1500px;
+      margin: 0 auto 120px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 45px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      overflow: hidden;
+      transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(0,212,255,0.18), rgba(168,85,247,0.18));
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 1;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover {
+      transform: translateY(-25px) scale(1.04);
+      border-color: var(--accent);
+      box-shadow: 0 35px 70px rgba(0,212,255,0.3);
+    }
+    .feature-img-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+    }
+    .feature-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease;
+      filter: brightness(0.82);
+    }
+    .feature-card:hover .feature-img {
+      transform: scale(1.18);
+      filter: brightness(1);
+    }
+    .feature-badge {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      z-index: 2;
+      color: #fff;
+    }
+    .feature-content {
+      padding: 38px;
+      position: relative;
+      z-index: 2;
+    }
+    .feature-icon {
+      font-size: 3.5rem;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 22px;
+      display: block;
+    }
+    .feature-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+    .feature-desc {
+      color: var(--text-muted);
+      line-height: 1.9;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+    .feature-stats {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+    .feature-stat {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      background: rgba(0,212,255,0.07);
+      border-radius: 12px;
+      border: 1px solid rgba(0,212,255,0.12);
+    }
+    .feature-stat-value {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .feature-stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .feature-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: rgba(0,212,255,0.12);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 60px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.4s ease;
+      font-size: 0.95rem;
+    }
+    .feature-btn:hover {
+      color: #0a0e17;
+      transform: translateX(10px);
+      box-shadow: 0 6px 25px rgba(0,212,255,0.5);
+      background: var(--accent);
+    }
+    .testimonials {
+      max-width: 1300px;
+      margin: 160px auto;
+      padding: 0 20px;
+    }
+    .testimonials-title {
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 70px;
+    }
+    .testimonial-slider {
+      display: flex;
+      gap: 35px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 25px 0;
+      scrollbar-width: none;
+    }
+    .testimonial-slider::-webkit-scrollbar { display: none; }
+    .testimonial-card {
+      min-width: 380px;
+      background: var(--card);
+      padding: 40px;
+      border-radius: 25px;
+      border: 1px solid var(--border);
+      scroll-snap-align: center;
+      transition: all 0.4s;
+    }
+    .testimonial-card:hover {
+      transform: translateY(-12px);
+      border-color: var(--accent);
+      box-shadow: 0 25px 50px rgba(0,212,255,0.25);
+    }
+    .testimonial-text {
+      color: var(--text);
+      line-height: 1.9;
+      margin-bottom: 25px;
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .testimonial-avatar {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fff;
+    }
+    .testimonial-info h4 { color: var(--text); font-weight: 600; }
+    .testimonial-info p { color: var(--text-muted); font-size: 0.9rem; }
+    .faq {
+      max-width: 1000px;
+      margin: 160px auto;
+      padding: 0 20px;
+    }
+    .faq-title {
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 70px;
+    }
+    .faq-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 25px;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .faq-item:hover { border-color: var(--accent); }
+    .faq-question {
+      padding: 28px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: var(--text);
+      transition: all 0.4s;
+    }
+    .faq-question:hover { color: var(--accent); }
+    .faq-question i { transition: transform 0.4s; }
+    .faq-item.active .faq-question i { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      padding: 0 28px;
+      color: var(--text-muted);
+      line-height: 1.9;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 600px;
+      padding: 0 28px 28px;
+    }
+    .newsletter {
+      max-width: 900px;
+      margin: 160px auto;
+      padding: 70px 50px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(168,85,247,0.12));
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      text-align: center;
+    }
+    .newsletter h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      margin-bottom: 18px;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .newsletter p {
+      color: var(--text-muted);
+      margin-bottom: 35px;
+      font-size: 1.1rem;
+    }
+    .newsletter-form {
+      display: flex;
+      gap: 18px;
+      max-width: 550px;
+      margin: 0 auto;
+    }
+    .newsletter-form input {
+      flex: 1;
+      padding: 18px 30px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      color: var(--text);
+      font-size: 1.05rem;
+      outline: none;
+      transition: all 0.4s;
+    }
+    .newsletter-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 25px rgba(0,212,255,0.25);
+    }
+    .newsletter-form button {
+      padding: 18px 40px;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      border: none;
+      border-radius: 60px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.4s;
+      white-space: nowrap;
+    }
+    .newsletter-form button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 12px 35px rgba(0,212,255,0.5);
+    }
+    footer {
+      padding: 90px 60px 50px;
+      background: rgba(17,21,31,0.6);
+      border-top: 1px solid var(--border);
+    }
+    .footer-content {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-section h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent);
+      margin-bottom: 25px;
+      font-size: 1.3rem;
+    }
+    .footer-section p, .footer-section a {
+      color: var(--text-muted);
+      line-height: 2.1;
+      text-decoration: none;
+      display: block;
+      transition: color 0.4s;
+    }
+    .footer-section a:hover {
+      color: var(--accent);
+      padding-left: 6px;
+    }
+    .social-links {
+      display: flex;
+      gap: 18px;
+      margin-top: 25px;
+    }
+    .social-links a {
+      width: 50px;
+      height: 50px;
+      background: rgba(0,212,255,0.12);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s;
+      font-size: 1.2rem;
+    }
+    .social-links a:hover {
+      background: var(--accent);
+      color: #0a0e17;
+      transform: translateY(-6px);
+      box-shadow: 0 12px 25px rgba(0,212,255,0.35);
+    }
+    .footer-bottom {
+      text-align: center;
+      padding-top: 35px;
+      border-top: 1px solid var(--border);
+      color: #666;
+      font-size: 0.95rem;
+    }
+    .back-to-top {
+      position: fixed;
+      bottom: 35px;
+      right: 35px;
+      width: 60px;
+      height: 60px;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.6rem;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(120px);
+      transition: all 0.5s;
+      z-index: 999;
+      box-shadow: 0 6px 25px rgba(0,212,255,0.45);
+    }
+    .back-to-top.visible { opacity: 1; transform: translateY(0); }
+    .back-to-top:hover {
+      transform: translateY(-6px) scale(1.12);
+      box-shadow: 0 12px 35px rgba(0,212,255,0.65);
+    }
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 4px;
+      background: var(--gradient);
+      background-size: var(--gradient-shift);
+      z-index: 10000;
+      transition: width 0.25s;
+    }
+    @media (max-width: 768px) {
+      .logo { font-size: 3.2rem; }
+      .tagline { font-size: 1.2rem; }
+      .features { grid-template-columns: 1fr; padding: 0 15px; }
+      .nav-links { display: none; }
+      nav { padding: 15px 25px; }
+      .features-title { font-size: 2.8rem; }
+      .cta-group { flex-direction: column; align-items: center; }
+      .newsletter-form { flex-direction: column; }
+      .footer-content { grid-template-columns: 1fr; }
+      .stats { flex-direction: column; gap: 35px; }
+      .testimonial-slider { gap: 20px; }
+      .testimonial-card { min-width: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursorFollower"></div>
+  <canvas class="bg-canvas" id="bgCanvas"></canvas>
+  <div class="bg-overlay"></div>
+  <nav>
+    <div class="nav-logo">AssistAI Pro</div>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </button>
+  </nav>
+  <section class="hero" id="home">
+    <div class="logo">AssistAI Pro</div>
+    <p class="tagline">Next-Gen Enterprise AI Suite • Built for Fortune 500 • Zero-Code Deployment</p>
+    <div class="cta-group">
+      <a href="#features" class="cta-button">
+        <span>Explore Suite</span>
+        <i class="fas fa-rocket"></i>
+      </a>
+      <a href="/demo" class="cta-button cta-secondary">
+        <span>Live Demo</span>
+        <i class="fas fa-play"></i>
+      </a>
+    </div>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" data-target="500">0</div>
+        <div class="stat-label">Global Clients</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="99">0</div>
+        <div class="stat-label">Uptime %</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="10">0</div>
+        <div class="stat-label">M Tasks/Day</div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+  <div class="features-header">
+    <h2 class="features-title">Enterprise AI Arsenal</h2>
+    <p class="features-subtitle">Six battle-tested AI modules transforming MNC operations. Deployed by 500+ global leaders.</p>
+  </div>
+  <div class="filter-tabs">
+    <div class="filter-tab active" data-filter="all">All Tools</div>
+    <div class="filter-tab" data-filter="automation">Automation</div>
+    <div class="filter-tab" data-filter="analytics">Analytics</div>
+    <div class="filter-tab" data-filter="communication">Communication</div>
+  </div>
+  <section class="features" id="features">
+    <div class="feature-card" data-category="communication" onclick="location.href='/email-drafter'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1596526131083-e8c633c948d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Email Drafter" class="feature-img">
+        <div class="feature-badge">Most Used</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-envelope feature-icon"></i>
+        <h3 class="feature-title">Email Drafter</h3>
+        <p class="feature-desc">AI crafts perfectly toned, context-aware emails in seconds. Supports 50+ languages with real-time compliance checks and sentiment analysis.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">90%</div>
+            <div class="feature-stat-label">Time Saved</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">50+</div>
+            <div class="feature-stat-label">Languages</div>
+          </div>
+        </div>
+        <a href="/email-drafter" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="feature-card" data-category="automation" onclick="location.href='/leave-processor'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1506784365847-bbad939e9335?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Leave Processor" class="feature-img">
+        <div class="feature-badge">Zero-Touch</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-calendar-check feature-icon"></i>
+        <h3 class="feature-title">Leave Processor</h3>
+        <p class="feature-desc">Zero-touch HR automation with intelligent policy-aware approvals, real-time balance tracking, and audit-ready logs.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">100%</div>
+            <div class="feature-stat-label">Automated</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">24/7</div>
+            <div class="feature-stat-label">Processing</div>
+          </div>
+        </div>
+        <a href="/leave-processor" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="feature-card" data-category="automation" onclick="location.href='/meeting-scheduler'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Meeting Scheduler" class="feature-img">
+        <div class="feature-badge">Smart AI</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-clock feature-icon"></i>
+        <h3 class="feature-title">Meeting Scheduler</h3>
+        <p class="feature-desc">AI detects calendar conflicts, suggests optimal time slots, sends automated invites, and generates comprehensive post-meeting summaries.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">80%</div>
+            <div class="feature-stat-label">Faster Scheduling</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">Auto</div>
+            <div class="feature-stat-label">Summaries</div>
+          </div>
+        </div>
+        <a href="/meeting-scheduler" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="feature-card" data-category="analytics" onclick="location.href='/performance-analyzer'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Performance Analyzer" class="feature-img">
+        <div class="feature-badge">Real-time</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-chart-line feature-icon"></i>
+        <h3 class="feature-title">Performance Analyzer</h3>
+        <p class="feature-desc">Real-time performance insights with 360° feedback synthesis, predictive analytics, and AI-generated personalized growth roadmaps.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">360°</div>
+            <div class="feature-stat-label">Feedback</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">Live</div>
+            <div class="feature-stat-label">Insights</div>
+          </div>
+        </div>
+        <a href="/performance-analyzer" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="feature-card" data-category="communication" onclick="location.href='/policy-chatbot'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Policy Chatbot" class="feature-img">
+        <div class="feature-badge">Instant Answers</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-robot feature-icon"></i>
+        <h3 class="feature-title">Policy Chatbot</h3>
+        <p class="feature-desc">Ask anything, get instant cited answers from your 1000+ page policy library. Natural language processing with source attribution.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">1000+</div>
+            <div class="feature-stat-label">Pages Indexed</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">< 2s</div>
+            <div class="feature-stat-label">Response Time</div>
+          </div>
+        </div>
+        <a href="/policy-chatbot" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="feature-card" data-category="automation" onclick="location.href='/resume-screener'">
+      <div class="feature-img-container">
+        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Resume Screener" class="feature-img">
+        <div class="feature-badge">AI Powered</div>
+      </div>
+      <div class="feature-content">
+        <i class="fas fa-search feature-icon"></i>
+        <h3 class="feature-title">Resume Screener</h3>
+        <p class="feature-desc">AI scores candidates against job requirements, highlights skill gaps, and ranks matches — cuts screening time by 90%.</p>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">90%</div>
+            <div class="feature-stat-label">Time Saved</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">Auto</div>
+            <div class="feature-stat-label">Ranking</div>
+          </div>
+        </div>
+        <a href="/resume-screener" class="feature-btn">
+          <span>Launch</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="testimonials" id="testimonials">
+    <h2 class="testimonials-title">What Leaders Say</h2>
+    <div class="testimonial-slider">
+      <div class="testimonial-card">
+        <p class="testimonial-text">"AssistAI Pro reduced our HR processing time by 75%. The ROI was evident within the first month. Absolutely game-changing for our operations."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">SK</div>
+          <div class="testimonial-info">
+            <h4>Sarah Kim</h4>
+            <p>VP Operations, TechCorp</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-text">"The Email Drafter alone saves each team member 2 hours daily. The AI understands context better than we imagined possible."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MP</div>
+          <div class="testimonial-info">
+            <h4>Michael Peters</h4>
+            <p>CEO, GlobalNet Inc</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-text">"Seamless integration, powerful features, and exceptional support. AssistAI Pro is now indispensable to our daily workflow."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AL</div>
+          <div class="testimonial-info">
+            <h4>Aisha Lopez</h4>
+            <p>CTO, DataDrive Solutions</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-text">"The Performance Analyzer provides insights we never had before. It's transformed how we approach team development and growth."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">RJ</div>
+          <div class="testimonial-info">
+            <h4>Robert Johnson</h4>
+            <p>HR Director, Innovate Labs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="faq" id="faq">
+    <h2 class="faq-title">Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>How quickly can we deploy AssistAI Pro?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Most enterprises are fully operational within 48 hours. Our white-glove onboarding includes data migration, team training, and custom workflow setup.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Is our data secure and compliant?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Absolutely. We're SOC 2 Type II certified, GDPR compliant, and offer enterprise-grade encryption. Your data never leaves your secure environment.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Can AssistAI Pro integrate with our existing tools?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Yes! We offer native integrations with 50+ enterprise platforms including Salesforce, SAP, Oracle, Microsoft 365, Google Workspace, and more.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>What kind of support do you provide?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Enterprise clients receive 24/7 priority support with dedicated account managers, custom training sessions, and guaranteed <4 hour response times.
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>What's the pricing structure?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        We offer flexible per-user pricing starting at $49/month, with volume discounts for enterprises. Contact our sales team for a custom quote tailored to your needs.
+      </div>
+    </div>
+  </section>
+  <section class="newsletter">
+    <h2>Stay Updated</h2>
+    <p>Get the latest AI insights, product updates, and exclusive enterprise tips delivered to your inbox.</p>
+    <form class="newsletter-form" id="newsletterForm">
+      <input type="email" placeholder="Enter your email" required>
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>AssistAI Pro</h3>
+        <p>Enterprise-grade AI automation suite transforming how modern businesses operate. Built for scale, designed for results.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Products</h3>
+        <a href="/email-drafter">Email Drafter</a>
+        <a href="/leave-processor">Leave Processor</a>
+        <a href="/meeting-scheduler">Meeting Scheduler</a>
+        <a href="/performance-analyzer">Performance Analyzer</a>
+        <a href="/policy-chatbot">Policy Chatbot</a>
+        <a href="/resume-screener">Resume Screener</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Developed with <i class="fas fa-heart" style="color:#e91e63"></i> by Dhimaan Dutta • © 2025 AssistAI Pro. All rights reserved.</p>
+    </div>
+  </footer>
+  <button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+  <script>
+    const cursor = document.getElementById('cursor');
+    const cursorFollower = document.getElementById('cursorFollower');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        cursorFollower.style.left = e.clientX + 'px';
+        cursorFollower.style.top = e.clientY + 'px';
+      }, 100);
+    });
+    document.addEventListener('mousedown', () => cursor.classList.add('active'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const particles = [];
+    const particleCount = 50;
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 2;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+        ctx.fill();
+      }
+    }
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      document.getElementById('progressBar').style.width = scrollPercent + '%';
+    });
+    const counters = document.querySelectorAll('.stat-number');
+    const speed = 200;
+    const countUp = (counter) => {
+      const target = +counter.getAttribute('data-target');
+      const count = +counter.innerText;
+      const increment = target / speed;
+      if (count < target) {
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(() => countUp(counter), 1);
+      } else {
+        counter.innerText = target + (target === 99 ? '.9' : target === 10 ? 'M' : '+');
+      }
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          counters.forEach(counter => countUp(counter));
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(document.querySelector('.stats'));
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', () => {
+        const item = question.parentElement;
+        const wasActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(faq => faq.classList.remove('active'));
+        if (!wasActive) item.classList.add('active');
+      });
+    });
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const featureCards = document.querySelectorAll('.feature-card');
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const filter = tab.getAttribute('data-filter');
+        featureCards.forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'block';
+            setTimeout(() => card.style.opacity = '1', 10);
+          } else {
+            card.style.opacity = '0';
+            setTimeout(() => card.style.display = 'none', 300);
+          }
+        });
+      });
+    });
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    const themeToggle = document.getElementById('themeToggle');
+    let isDark = true;
+    themeToggle.addEventListener('click', () => {
+      isDark = !isDark;
+      document.body.style.filter = isDark ? 'none' : 'invert(1) hue-rotate(180deg)';
+      themeToggle.querySelector('i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+    document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const button = e.target.querySelector('button');
+      const originalText = button.textContent;
+      button.textContent = 'Subscribing...';
+      button.disabled = true;
+      setTimeout(() => {
+        button.textContent = 'Subscribed!';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.disabled = false;
+        }, 2000);
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

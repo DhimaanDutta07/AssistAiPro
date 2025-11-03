@@ -1,0 +1,8 @@
+flask
+langchain
+langgraph
+langchain-cohere
+langchain_community
+sentence-transformers
+huggingface-hub
+python-dotenv
