@@ -17,3 +17,12 @@ openai
 PyYAML
 python-multipart
 pytz
+Flask
+flask-cors
+cohere
+langchain
+langchain-cohere
+langchain-embeddings
+langchain-utilities
+langgraph-sdk
+...
