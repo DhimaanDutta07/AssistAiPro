@@ -8,5 +8,7 @@ langgraph
 langchain-core
 langchain-community
 langchain-cohere
+pytz
+pydantic
 
 
