@@ -9,5 +9,5 @@ langchain-community
 langchain-cohere
 pytz
 pydantic
-uvicorn
+gunicorn
 sentence-transformers
