@@ -1,14 +1,17 @@
 import os
 from typing import Dict, List
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import CohereEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from utils.cohere_integration import get_llm
 
 PDF_PATH = "agents/fictional_company_policies_handbook.pdf"
 DB_PATH = "backend/data/policies"
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = CohereEmbeddings(
+    model="small",                
+    api_key=os.environ["COHERE_API_KEY"]
+)
 llm = get_llm()
 
 def _load_pdf_documents() -> List:
