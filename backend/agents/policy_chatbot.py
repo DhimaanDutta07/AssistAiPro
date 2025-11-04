@@ -8,10 +8,7 @@ from utils.cohere_integration import get_llm
 PDF_PATH = "agents/fictional_company_policies_handbook.pdf"
 DB_PATH = "backend/data/policies"
 
-embeddings = CohereEmbeddings(
-    model="small",                
-    api_key=os.environ["COHERE_API_KEY"]
-)
+embeddings = CohereEmbeddings(model="embed-english-light-v3.0", cohere_api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y")
 llm = get_llm()
 
 def _load_pdf_documents() -> List:
