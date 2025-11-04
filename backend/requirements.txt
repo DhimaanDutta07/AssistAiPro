@@ -4,6 +4,7 @@ requests
 python-dotenv
 cohere
 langchain
+langgraph
 langchain-core
 langchain-community
 langchain-cohere
