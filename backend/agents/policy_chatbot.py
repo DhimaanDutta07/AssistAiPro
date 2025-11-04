@@ -3,7 +3,7 @@ from typing import Dict, List
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_cohere import ChatCohere
-from langchain.chains import RetrievalQA
+from langchain_community.chains import RetrievalQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain_community.document_loaders import PyPDFLoader
