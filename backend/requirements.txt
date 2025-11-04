@@ -12,9 +12,9 @@ tensorflow
 numpy
 pandas
 requests
-supabase
+supabase-py==2.3.4
 openai
-PyYAML
+PyYAML==6.0.1
 python-multipart
 pytz
 langgraph
