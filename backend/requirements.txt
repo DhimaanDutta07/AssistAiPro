@@ -1,4 +1,3 @@
-PyYAML==6.0.1
 flask
 flask-cors
 python-dotenv
@@ -17,3 +16,6 @@ openai
 python-multipart
 pytz
 langgraph
+fastapi
+uvicorn
+aiofiles
