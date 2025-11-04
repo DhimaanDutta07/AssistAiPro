@@ -17,6 +17,4 @@ openai
 PyYAML
 python-multipart
 pytz
-langchain-embeddings
-langchain-utilities
-langgraph-sdk
+langgraph
