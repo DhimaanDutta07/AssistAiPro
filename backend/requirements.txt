@@ -10,5 +10,4 @@ langchain-community
 langchain-cohere
 pytz
 pydantic
-sentence-transformers
 
