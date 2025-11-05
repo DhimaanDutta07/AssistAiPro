@@ -5,8 +5,8 @@ from langchain_cohere import CohereEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from utils.cohere_integration import get_llm
 
-PDF_PATH = "agents/fictional_company_policies_handbook.pdf"
-DB_PATH = "backend/data/policies"
+PDF_PATH = "fictional_company_policies_handbook.pdf"
+DB_PATH = "data/policies"
 
 embeddings = CohereEmbeddings(
     model="embed-english-light-v3.0",
