@@ -14,6 +14,10 @@ from agents.leave_processor import leave_processor_agent
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+@app.route("/")
+def home():
+    return jsonify({"message": "AssistAI Pro backend is running successfully!"}), 200
+
 @app.route('/email-drafter', methods=['POST'])
 def route_email_drafter():
     data = request.get_json(force=True)
@@ -53,5 +57,5 @@ def route_leave_processor():
     return jsonify(result), 200
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))  
     app.run(host="0.0.0.0", port=port)
