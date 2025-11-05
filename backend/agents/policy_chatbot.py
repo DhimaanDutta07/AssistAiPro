@@ -10,13 +10,12 @@ DB_PATH = "backend/data/policies"
 
 embeddings = CohereEmbeddings(
     model="embed-english-light-v3.0",
-    cohere_api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y")
+    cohere_api_key=os.getenv("COHERE_API_KEY")
+)
 
 llm = get_llm()
 
-def _load_pdf_documents() -> List[dict]:
-    if not os.path.exists(PDF_PATH):
-        raise FileNotFoundError(f"PDF not found at {PDF_PATH}")
+def _load_pdf_documents() -> List:
     loader = PyPDFLoader(PDF_PATH)
     pages = loader.load()
     for i, page in enumerate(pages):
@@ -25,37 +24,30 @@ def _load_pdf_documents() -> List[dict]:
     return pages
 
 def _create_or_load_vectorstore() -> Chroma:
-    if not os.path.exists(DB_PATH):
-        os.makedirs(DB_PATH)
+    os.makedirs(DB_PATH, exist_ok=True)
     if not os.listdir(DB_PATH):
         docs = _load_pdf_documents()
-        vectordb = Chroma.from_documents(
-            documents=docs,
-            embedding=embeddings,
-            persist_directory=DB_PATH
-        )
+        vectordb = Chroma.from_documents(docs, embedding=embeddings, persist_directory=DB_PATH)
         vectordb.persist()
     else:
-        vectordb = Chroma(
-            persist_directory=DB_PATH,
-            embedding_function=embeddings
-        )
+        vectordb = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
     return vectordb
 
 vectordb = _create_or_load_vectorstore()
-retriever = vectordb.as_retriever(search_kwargs={"k": 4})
 
 def policy_chatbot_agent(payload: Dict) -> Dict:
     question = payload.get("question", "").strip()
     if not question:
         return {"error": "Missing 'question' in payload"}
     try:
-        results = retriever.get_relevant_documents(question)
+        results = vectordb.similarity_search(question, k=4)
         if not results:
-            return {"answer": "Sorry, I couldn't find anything related.", "sources": []}
+            return {"answer": "Sorry, no relevant info found.", "sources": []}
+
         context = "\n\n".join([doc.page_content for doc in results])
-        prompt = f"Answer the following question using this context:\n\n{context}\n\nQuestion: {question}"
+        prompt = f"Answer the question using the following context:\n\n{context}\n\nQuestion: {question}"
         response = llm.invoke(prompt)
+
         sources = []
         seen = set()
         for doc in results:
@@ -65,9 +57,11 @@ def policy_chatbot_agent(payload: Dict) -> Dict:
             if key not in seen and page:
                 sources.append(f"{src} (p. {page})")
                 seen.add(key)
+
         return {
             "answer": getattr(response, "content", str(response)),
             "sources": sources or ["Fictional Company Policies Handbook"]
         }
+
     except Exception as e:
         return {"error": str(e)}
