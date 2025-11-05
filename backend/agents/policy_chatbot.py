@@ -1,13 +1,10 @@
 import os
 from typing import Dict, List
 from langchain_community.vectorstores import Chroma
-from langchain_cohere import ChatCohere
-from langchain_community.chains import RetrievalQA
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
-from langchain_community.document_loaders import PyPDFLoader
-from utils.cohere_integration import get_llm
 from langchain_cohere import CohereEmbeddings
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.schema import Document
+from utils.cohere_integration import get_llm
 
 PDF_PATH = "agents/fictional_company_policies_handbook.pdf"
 DB_PATH = "backend/data/policies"
@@ -33,42 +30,37 @@ def _create_or_load_vectorstore() -> Chroma:
         os.makedirs(DB_PATH)
     if not os.listdir(DB_PATH):
         docs = _load_pdf_documents()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        splits = text_splitter.split_documents(docs)
-        vectordb = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory=DB_PATH)
+        vectordb = Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory=DB_PATH)
         vectordb.persist()
     else:
         vectordb = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
     return vectordb
 
 vectordb = _create_or_load_vectorstore()
-retriever = vectordb.as_retriever(search_kwargs={"k": 6})
-
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True
-)
+retriever = vectordb.as_retriever(search_kwargs={"k": 4})
 
 def policy_chatbot_agent(payload: Dict) -> Dict:
     question = payload.get("question", "").strip()
     if not question:
         return {"error": "Missing 'question' in payload"}
     try:
-        result = qa_chain.invoke({"query": question})
-        answer = result["result"]
+        results = retriever.get_relevant_documents(question)
+        if not results:
+            return {"answer": "Sorry, I couldn't find anything related.", "sources": []}
+        context = "\n\n".join([doc.page_content for doc in results])
+        prompt = f"Answer the following question using the context:\n\nContext:\n{context}\n\nQuestion: {question}"
+        response = llm.invoke(prompt)
         sources = []
         seen = set()
-        for doc in result["source_documents"]:
-            src = doc.metadata["source"]
+        for doc in results:
+            src = doc.metadata.get("source")
             page = doc.metadata.get("page")
             key = (src, page)
             if key not in seen and page:
                 sources.append(f"{src} (p. {page})")
                 seen.add(key)
         return {
-            "answer": answer,
+            "answer": getattr(response, "content", str(response)),
             "sources": sources or ["Fictional Company Policies Handbook"]
         }
     except Exception as e:
