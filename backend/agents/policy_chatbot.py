@@ -10,11 +10,11 @@ DB_PATH = "backend/data/policies"
 
 embeddings = CohereEmbeddings(
     model="embed-english-light-v3.0",
-    cohere_api_key=os.getenv("COHERE_API_KEY")
-)
+    cohere_api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y")
+
 llm = get_llm()
 
-def _load_pdf_documents():
+def _load_pdf_documents() -> List[dict]:
     if not os.path.exists(PDF_PATH):
         raise FileNotFoundError(f"PDF not found at {PDF_PATH}")
     loader = PyPDFLoader(PDF_PATH)
@@ -24,15 +24,22 @@ def _load_pdf_documents():
         page.metadata["source"] = os.path.basename(PDF_PATH)
     return pages
 
-def _create_or_load_vectorstore():
+def _create_or_load_vectorstore() -> Chroma:
     if not os.path.exists(DB_PATH):
         os.makedirs(DB_PATH)
     if not os.listdir(DB_PATH):
         docs = _load_pdf_documents()
-        vectordb = Chroma.from_documents(documents=docs, embedding=embeddings, persist_directory=DB_PATH)
+        vectordb = Chroma.from_documents(
+            documents=docs,
+            embedding=embeddings,
+            persist_directory=DB_PATH
+        )
         vectordb.persist()
     else:
-        vectordb = Chroma(persist_directory=DB_PATH, embedding_function=embeddings)
+        vectordb = Chroma(
+            persist_directory=DB_PATH,
+            embedding_function=embeddings
+        )
     return vectordb
 
 vectordb = _create_or_load_vectorstore()
