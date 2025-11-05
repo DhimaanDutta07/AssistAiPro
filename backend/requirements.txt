@@ -8,3 +8,4 @@ langchain-cohere>=0.4.6
 pytz>=2025.2
 pydantic>=2.11.10
 chromadb
+pypdf
