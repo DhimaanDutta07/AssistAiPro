@@ -3,7 +3,6 @@ from typing import Dict, List
 from langchain_community.vectorstores import Chroma
 from langchain_cohere import CohereEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.schema import Document
 from utils.cohere_integration import get_llm
 
 PDF_PATH = "agents/fictional_company_policies_handbook.pdf"
@@ -11,11 +10,11 @@ DB_PATH = "backend/data/policies"
 
 embeddings = CohereEmbeddings(
     model="embed-english-light-v3.0",
-    cohere_api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y"
+    cohere_api_key=os.getenv("COHERE_API_KEY")
 )
 llm = get_llm()
 
-def _load_pdf_documents() -> List[Document]:
+def _load_pdf_documents():
     if not os.path.exists(PDF_PATH):
         raise FileNotFoundError(f"PDF not found at {PDF_PATH}")
     loader = PyPDFLoader(PDF_PATH)
@@ -25,7 +24,7 @@ def _load_pdf_documents() -> List[Document]:
         page.metadata["source"] = os.path.basename(PDF_PATH)
     return pages
 
-def _create_or_load_vectorstore() -> Chroma:
+def _create_or_load_vectorstore():
     if not os.path.exists(DB_PATH):
         os.makedirs(DB_PATH)
     if not os.listdir(DB_PATH):
@@ -48,7 +47,7 @@ def policy_chatbot_agent(payload: Dict) -> Dict:
         if not results:
             return {"answer": "Sorry, I couldn't find anything related.", "sources": []}
         context = "\n\n".join([doc.page_content for doc in results])
-        prompt = f"Answer the following question using the context:\n\nContext:\n{context}\n\nQuestion: {question}"
+        prompt = f"Answer the following question using this context:\n\n{context}\n\nQuestion: {question}"
         response = llm.invoke(prompt)
         sources = []
         seen = set()
