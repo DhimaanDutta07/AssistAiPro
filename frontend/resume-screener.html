@@ -153,7 +153,7 @@ analyzeBtn.addEventListener('click',async()=>{if(!selectedFile)return;
 analyzeBtn.disabled=true;analyzeBtn.innerHTML='<span>Valuating...</span><i class="fas fa-spinner fa-spin"></i>';
 const formData=new FormData();formData.append('resume_file',selectedFile);
 try{
-const res=await fetch('http://localhost:5000/resume-screener',{method:'POST',body:formData});
+const res=await fetch('https://assistaipro.onrender.com/resume-screener',{method:'POST',body:formData});
 if(!res.ok)throw new Error(`HTTP ${res.status}`);
 const data=await res.json();
 if(data.error){alert('Error: '+data.error)}else{
