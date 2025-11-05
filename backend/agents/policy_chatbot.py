@@ -10,9 +10,9 @@ DB_PATH = "backend/data/policies"
 
 embeddings = CohereEmbeddings(
     model="embed-english-light-v3.0",
-    api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y",
-    user_agent="assistai-pro"
+    cohere_api_key="W9T9D3DGjtqAEgPEAJlr0J8GWYMLDwSNm4EqYi3Y"
 )
+
 llm = get_llm()
 
 def _load_pdf_documents() -> List:
